@@ -136,13 +136,26 @@ class Server(XMLModel):
       self._tags = value
   # def tags
 
-  def run_script(self, script_id):
-    """ Runs script on this Server. """
-    href = self.href + "/run_script"
-    params = {'right_script': script_id}
-    response, content = self.rsapi.request(href, params, method="POST")
-    return Status(response.get('location'), self.rsapi)
+  def run_script(self, script_id, script_inputs=None):
+    """ Runs script on this Server.
+        
+        Input to the script may be passed in ``script_inputs`` dictionary.
+    """
+    # Build script href
+    script_href = "https://my.rightscale.com/api/acct/%s/right_scripts/%s" % \
+                  (self.rsapi.account, script_id)
+    params = {'server[right_script_href]': script_href}
 
+    # Prepare script inputs
+    script_inputs = script_inputs or {}
+    for param, value in script_inputs.items():
+        key = 'server[parameters][%s]' % param
+        params[key] = 'text:%s' % value
+
+    # Run script
+    href = self.href + "/run_script"
+    response, content = self.rsapi.request(href, body=params, method="POST")
+    return Status(response.get('location'), self.rsapi)
 
   def save(self):
     """ Save any modifications made to this Server.
