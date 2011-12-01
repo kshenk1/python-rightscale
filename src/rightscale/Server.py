@@ -11,6 +11,9 @@ from Status import Status
 import xml.etree.ElementTree as ElementTree
 XMLCLASS = ElementTree.XML("<a />").__class__
 
+class ExecutionError(Exception):
+    pass
+
 class Server(XMLModel):
   _nickname = None
   _href = None
@@ -182,7 +185,7 @@ class Server(XMLModel):
   def run_script(self, script_id, script_inputs=None):
     """ Runs script on this Server.
         
-        Input to the script may be passed in ``script_inputs`` dictionary.
+        Inputs to the script may be passed in ``script_inputs`` dictionary.
     """
     # Build script href
     script_href = "https://my.rightscale.com/api/acct/%s/right_scripts/%s" % \
@@ -198,6 +201,8 @@ class Server(XMLModel):
     # Run script
     href = self.href + "/run_script"
     response, content = self.rsapi.request(href, body=params, method="POST")
+    if 'location' not in response:
+        raise ExecutionError(content)
     return Status(response.get('location'), self.rsapi)
 
   def save(self):
