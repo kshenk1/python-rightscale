@@ -5,6 +5,7 @@ from rightscale.util import ElementTreeValueOK
 from rightscale import Servers
 from rightscale import Deployments
 from rightscale import Server
+from .Arrays import Arrays
 
 # TODO(sissel): better error handling and reporting.
 # TODO(sissel): document
@@ -144,6 +145,17 @@ class RightScale(object):
     response, content = self.request("servers.xml")
     return Servers(content, self)
   # def servers
+
+  @property
+  def arrays(self):
+    """ Query arrays in RightScale.
+    http://support.rightscale.com/15-References/RightScale_API_Reference_Guide/02-Management/09-Server_Arrays
+
+    Returns an Arrays object. """
+    self.ensure_authenticated()
+    response, content = self.request("server_arrays.xml")
+    return Arrays(content, self)
+  # def arrays
 
   def whoami(self):
     """ Try to find myself (this server) in RightScale.

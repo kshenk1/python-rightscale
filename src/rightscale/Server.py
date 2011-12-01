@@ -1,5 +1,6 @@
+import datetime
 from XMLModel import XMLModel
-from rightscale.util import ElementTreeValueOK
+from util import ElementTreeValueOK
 from Tag import Tag
 from Tags import Tags
 from ServerSettings import ServerSettings
@@ -14,7 +15,9 @@ class Server(XMLModel):
   _nickname = None
   _href = None
   _state = None
+  _updated_at = None
   _created_at = None
+  _server_type = None
   _current_instance_href = None
   _tags = list()
 
@@ -110,6 +113,46 @@ class Server(XMLModel):
     self._nickname = value
 
   @property
+  def state(self):
+    """ The server state (pending/booting/operational). """
+    return self._state
+
+  @state.setter
+  @ElementTreeValueOK
+  def state(self, value):
+    self._state = value
+
+  @property
+  def updated_at(self):
+    """ `datetime.datetime` of last server update. """
+    return self._updated_at
+
+  @updated_at.setter
+  @ElementTreeValueOK
+  def updated_at(self, value):
+    self._updated_at = self._parse_datetime(value)
+
+  @property
+  def created_at(self):
+    """ `datetime.datetime` of server creation. """
+    return self._created_at
+
+  @created_at.setter
+  @ElementTreeValueOK
+  def created_at(self, value):
+    self._created_at = self._parse_datetime(value)
+
+  @property
+  def server_type(self):
+    """ Server type (e.g. "ec2"). """
+    return self._server_type
+
+  @server_type.setter
+  @ElementTreeValueOK
+  def server_type(self, value):
+    self._server_type = value
+
+  @property
   def tags(self):
     """ The tags for this server. """
     if not self._tags:
@@ -189,6 +232,12 @@ class Server(XMLModel):
     # if len(self.tainted) > 0
   # def save
 
+  def _parse_datetime(self, datetime_str):
+    """ Return `datetime.datetime` object, parsed from string in
+        RightScale date/time format. """
+    return datetime.datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%SZ")
+
+
   ELEMENTS = {
     "current-instance-href": current_instance_href, 
     "href": href, 
@@ -196,12 +245,10 @@ class Server(XMLModel):
     "server-template-href": server_template,
     "settings": settings, 
     "deployment-href": deployment_href,
-
-    # TODO(sissel): Implement these
-    "updated-at": None,
-    "created-at": None,
-    "state": None,
-    "server-type": None,
+    "state": state,
+    "updated-at": updated_at,
+    "created-at": created_at,
+    "server-type": server_type,
 
     # Ignore the 'tags' data as this data is for the 'next' server version,
     # not the current instance.
