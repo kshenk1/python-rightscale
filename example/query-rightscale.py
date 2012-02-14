@@ -2,17 +2,24 @@
 from rightscale import RightScale
 import sys
 
-rsapi = RightScale(ACCOUNTID, USERNAME, PASSWORD)
+# Setup your API access
+accountid = 12345
+username = 'username'
+password = 'password'
+rsapi = RightScale(accountid, username, password)
 
+# Try to find myself (this server) in RightScale.
+# Returns None if you are not on RS system
 myself = rsapi.whoami()
 
-if myself is None:
-  print >>sys.stderr, "This system is not found in RightScale."
-  exit(1)
-  
+if myself is not None:
+    # Find all servers (including myself) in my deployment.
+    servers = [s for s in rsapi.servers if s.deployment_href == myself.deployment_href]
 
-# Find all servers (including myself) in my deployment.
-servers = [s for s in rsapi.servers if s.deployment_href == myself.deployment_href]
+else:
+    print "This system is not found in RightScale."
+    # Or just find all servers across all deployments
+    servers = [s for s in rsapi.servers]
 
 tagged = dict()
 for server in servers:
@@ -25,8 +32,8 @@ for server in servers:
 
 data = dict()
 
-data["deployment"] = myself.deployment.nickname
-data["name"] = myself.nickname
+# data["deployment"] = myself.deployment.nickname
+# data["name"] = myself.nickname
 data["servers"] = dict()
 for server in servers:
   data["servers"][server.nickname] = {
