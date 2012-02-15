@@ -1,6 +1,9 @@
 #!/usr/bin/env python
-from rightscale import RightScale
+
 import sys
+import json
+
+from rightscale import RightScale
 
 # Setup your API access
 accountid = 12345
@@ -15,7 +18,6 @@ myself = rsapi.whoami()
 if myself is not None:
     # Find all servers (including myself) in my deployment.
     servers = [s for s in rsapi.servers if s.deployment_href == myself.deployment_href]
-
 else:
     print "This system is not found in RightScale."
     # Or just find all servers across all deployments
@@ -42,10 +44,5 @@ for server in servers:
     "tags": [t.name for t in server.tags],
   }
 
-#data["tags"] = dict()
-#for tag,tagged_servers in tagged.iteritems():
-  #data["tags"][tag] = [s.nickname for s in tagged_servers]
-
-import json
 # Pretty-print the json so it's easily human-readable
 print json.dumps(data, indent=2)
