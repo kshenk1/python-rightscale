@@ -6,6 +6,7 @@ from rightscale import Servers
 from rightscale import Deployments
 from rightscale import Server
 from .Arrays import Arrays
+from .Instances import Instances
 
 # TODO(sissel): better error handling and reporting.
 # TODO(sissel): document
@@ -155,6 +156,14 @@ class RightScale(object):
     self.ensure_authenticated()
     response, content = self.request("server_arrays.xml")
     return Arrays(content, self)
+  # def arrays
+
+  #@property
+  def instances(self, array_id):
+    
+    self.ensure_authenticated()
+    response, content = self.request("server_arrays/%d/instances" % array_id)
+    return Instances(content, self)
   # def arrays
 
   def whoami(self):

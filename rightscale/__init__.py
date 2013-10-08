@@ -9,3 +9,5 @@ from Tag import Tag
 from Tags import Tags
 from Arrays import Arrays
 from Array import Array
+from Instances import Instances
+from Instance import Instance
