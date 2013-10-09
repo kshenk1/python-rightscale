@@ -164,7 +164,7 @@ class RightScale(object):
     self.ensure_authenticated()
     response, content = self.request("server_arrays/%d/instances" % array_id)
     return Instances(content, self)
-  # def arrays
+  # def instances
 
   def whoami(self):
     """ Try to find myself (this server) in RightScale.
